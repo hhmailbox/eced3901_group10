@@ -1,3 +1,4 @@
+#!/usr/bin/env python2
 import math
 import rospy as ros
 import sys
@@ -126,14 +127,20 @@ class SquareMoveVel(SquareMove):
 
     def move(self):
 
-        self.go_forward(2, 0.5)
-        self.turn(3.5, 0.5)
-        self.go_forward(2, 0.5)
-        self.turn(3.5, 0.5)
-        self.go_forward(2, 0.5)
-        self.turn(3.5, 0.5)
-        self.go_forward(2, 0.5)
+        self.go_forward(3, 0.1)
+        self.turn(3.5, 0.2)
         self.stop_robot()
+        
+        #self.go_forward(3, 0.1)
+        #self.turn(3.5, 0.2)
+        #self.stop_robot()
+        
+        #self.go_forward(3, 0.1)
+        #self.turn(3.5, 0.2)
+        #self.stop_robot()
+        
+        #self.go_forward(3, 0.1)
+        #self.stop_robot()
 
 
 class SquareMoveOdom(SquareMove):
@@ -159,7 +166,7 @@ class SquareMoveOdom(SquareMove):
         print roll, pitch, yaw
         return yaw
         
-    def move_of(self, d, speed=0.5):
+    def move_of(self, d, speed=0.1):
 
         x_init = self.odom_pose.position.x
         y_init = self.odom_pose.position.y
@@ -180,7 +187,7 @@ class SquareMoveOdom(SquareMove):
 
         sys.stdout.write("\n")
 
-    def turn_of(self, a, ang_speed=0.4):
+    def turn_of(self, a, ang_speed=0.1):
 
         # Convert the orientation quaternion message to Euler angles
         a_init = self.get_z_rotation(self.odom_pose.orientation)
@@ -208,14 +215,21 @@ class SquareMoveOdom(SquareMove):
         while self.odom_pose is None and not ros.is_shutdown():
             time.sleep(0.1)
 
-        # Implement main instructions
-        # self.move_of(0.5)
-        self.turn_of(math.pi/2)
+        # move 1
         self.move_of(0.5)
+        # turn 1
         self.turn_of(math.pi/2)
+        # move 2
         self.move_of(0.5)
+        # turn 2
         self.turn_of(math.pi/2)
+        # move 3
         self.move_of(0.5)
+        # turn 3
+        self.turn_of(math.pi/2)
+        # move 4
+        self.move_of(0.5)
+        # stop should be square
         self.stop_robot()
 
 
