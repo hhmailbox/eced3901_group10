@@ -7,15 +7,14 @@ from geometry_msgs.msg import Twist, Pose
 from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 
-
-__author__ = "Gabriel Urbain" 
+__author__ = "Gabriel Urbain"
 __copyright__ = "Copyright 2018, IDLab, UGent"
 
-__license__ = "MIT" 
-__version__ = "1.0" 
+__license__ = "MIT"
+__version__ = "1.0"
 __maintainer__ = "Gabriel Urbain"
-__email__ = "gabriel.urbain@ugent.be" 
-__status__ = "Education" 
+__email__ = "gabriel.urbain@ugent.be"
+__status__ = "Education"
 __date__ = "October 15th, 2018"
 
 
@@ -24,7 +23,6 @@ class SquareMove(object):
     This class is an abstract class to control a square trajectory on the turtleBot.
     It mainly declare and subscribe to ROS topics in an elegant way.
     """
-
     def __init__(self):
 
         # Declare ROS subscribers and publishers
@@ -50,8 +48,13 @@ class SquareMove(object):
         ros.on_shutdown(self.stop_robot)
 
         # Create the Subscribers and Publishers
-        self.odometry_sub = ros.Subscriber(self.odom_sub_name, Odometry, callback=self.__odom_ros_sub, queue_size=self.queue_size)
-        self.vel_pub = ros.Publisher(self.vel_pub_name, Twist, queue_size=self.queue_size)
+        self.odometry_sub = ros.Subscriber(self.odom_sub_name,
+                                           Odometry,
+                                           callback=self.__odom_ros_sub,
+                                           queue_size=self.queue_size)
+        self.vel_pub = ros.Publisher(self.vel_pub_name,
+                                     Twist,
+                                     queue_size=self.queue_size)
 
     def stop_robot(self):
 
@@ -60,7 +63,7 @@ class SquareMove(object):
 
         # We publish for a second to be sure the robot receive the message
         while time.time() - self.t_init < 1 and not ros.is_shutdown():
-            
+
             self.vel_ros_pub(Twist())
             time.sleep(self.pub_rate)
 
@@ -73,14 +76,10 @@ class SquareMove(object):
             time.sleep(1)
 
     def __odom_ros_sub(self, msg):
-
         self.odom_pose = msg.pose.pose
 
     def vel_ros_pub(self, msg):
-
         self.vel_pub.publish(msg)
-
-
 
 
 class SquareMoveVel(SquareMove):
@@ -91,9 +90,8 @@ class SquareMoveVel(SquareMove):
      - Start this node on your computer:
             $ python eced3901_dt1.py vel
     """
-
     def __init__(self):
-        
+
         super(SquareMoveVel, self).__init__()
 
     def go_forward(self, duration, speed):
@@ -112,7 +110,7 @@ class SquareMoveVel(SquareMove):
 
     def turn(self, duration, ang_speed):
 
-         # Get the initial time
+        # Get the initial time
         self.t_init = time.time()
 
         # Set the velocity forward and wait 2 sec (do it in a while loop to keep publishing the velocity)
@@ -125,14 +123,13 @@ class SquareMoveVel(SquareMove):
             time.sleep(self.pub_rate)
 
     def move(self):
-
-        self.go_forward(0, 0.5)
-        self.turn(3.5, 0.5)
-        self.go_forward(0, 0.5)
-        self.turn(3.5, 0.5)
-        self.go_forward(0, 0.5)
-        self.turn(3.5, 0.5)
-        self.go_forward(0, 0.5)
+        self.go_forward(0.1, 0.1)
+        self.turn(3.5, 0.1)
+        self.go_forward(0.1, 0.1)
+        self.turn(3.5, 0.1)
+        self.go_forward(0.1, 0.1)
+        self.turn(3.5, 0.1)
+        self.go_forward(0.1, 0.1)
         self.stop_robot()
 
 
@@ -145,9 +142,7 @@ class SquareMoveOdom(SquareMove):
      - Start this node on your computer:
             $ python eced3901_dt1.py odom
     """
-
     def __init__(self):
-
 
         super(SquareMoveOdom, self).__init__()
 
@@ -155,10 +150,11 @@ class SquareMoveOdom(SquareMove):
 
     def get_z_rotation(self, orientation):
 
-        (roll, pitch, yaw) = euler_from_quaternion([orientation.x, orientation.y, orientation.z, orientation.w])
+        (roll, pitch, yaw) = euler_from_quaternion(
+            [orientation.x, orientation.y, orientation.z, orientation.w])
         print roll, pitch, yaw
         return yaw
-        
+
     def move_of(self, d, speed=0.2):
 
         x_init = self.odom_pose.position.x
@@ -187,7 +183,8 @@ class SquareMoveOdom(SquareMove):
         print a_init
 
         # Set the angular velocity forward until angle is reached
-        while (self.get_z_rotation(self.odom_pose.orientation) - a_init) < a and not ros.is_shutdown():
+        while (self.get_z_rotation(self.odom_pose.orientation) -
+               a_init) < a and not ros.is_shutdown():
 
             # sys.stdout.write("\r [TURN] The robot has turned of {:.2f}".format(self.get_z_rotation(self.odom_pose.orientation) - \
             #     a_init) + "rad over {:.2f}".format(a) + "rad")
@@ -210,15 +207,13 @@ class SquareMoveOdom(SquareMove):
 
         # Implement main instructions
         # self.move_of(0.5)
-        self.turn_of(math.pi/2)
+        self.turn_of(math.pi / 2)
         self.move_of(1)
-        self.turn_of(math.pi/2)
+        self.turn_of(math.pi / 2)
         self.move_of(1)
-        self.turn_of(math.pi/2)
+        self.turn_of(math.pi / 2)
         self.move_of(1)
         self.stop_robot()
-
-
 
 
 if __name__ == '__main__':
@@ -241,4 +236,3 @@ if __name__ == '__main__':
     # Listen and Publish to ROS + execute moving instruction
     r.start_ros()
     r.move()
-
