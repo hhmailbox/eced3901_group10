@@ -159,12 +159,12 @@ class SquareMoveOdom(SquareMove):
 
         super(SquareMoveOdom, self).__init__()
 
-        self.pub_rate = 0.2
+        self.pub_rate = 0.1
 
     def get_z_rotation(self, orientation):
 
         (roll, pitch, yaw) = euler_from_quaternion([orientation.x, orientation.y, orientation.z, orientation.w])
-        print roll, pitch, yaw
+        # print yaw
         return yaw
         
     def move_of(self, d, speed=0.2):
@@ -188,17 +188,21 @@ class SquareMoveOdom(SquareMove):
             time.sleep(self.pub_rate)
 
         sys.stdout.write("\n")
+        
+    
 
     def turn_of(self, a, ang_speed = 0.5):
 
         # Convert the orientation quaternion message to Euler angles
         a_init = self.get_z_rotation(self.odom_pose.orientation)
-        # print a_init
+        print a_init
 
         # Set the angular velocity forward until angle is reached
-        while ((self.get_z_rotation(self.odom_pose.orientation) - a_init) < a) and not ros.is_shutdown():
-            # sys.stdout.write("\r [TURN] The robot has turned of {:.2f}".format(self.get_z_rotation(self.odom_pose.orientation) - a_init) + "rad over {:.2f}".format(a) + "rad")
-            # sys.stdout.flush()
+
+        # TODO: fix this
+        while abs(self.get_z_rotation(self.odom_pose.orientation) - a_init) % (2*math.pi) < a and not ros.is_shutdown():
+            sys.stdout.write("\r [TURN] The robot has turned of {:.2f}".format(abs(self.get_z_rotation(self.odom_pose.orientation) - a_init) % (2*math.pi)) + "rad over {:.2f}".format(a) + "rad")
+            sys.stdout.flush()
             # print (self.get_z_rotation(self.odom_pose.orientation) - a_init)
 
             msg = Twist()
@@ -218,7 +222,7 @@ class SquareMoveOdom(SquareMove):
         # Wait that our python program has received its first messages
         while self.odom_pose is None and not ros.is_shutdown():
             time.sleep(0.1)
-
+        
         # move 1
         self.move_of(0.5)
         # turn 1
@@ -264,5 +268,3 @@ if __name__ == '__main__':
     # Listen and Publish to ROS + execute moving instruction
     r.start_ros()
     r.move()
-
-
